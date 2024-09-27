@@ -20,27 +20,29 @@ class HumanGreeter(object):
         app.start()
         session = app.session
         self.awake = True
-
+        self.ip = ip
         # Get the service ALMemory.
         self.memory = session.service("ALMemory")
 
-        #creates an event listener for the justArrived flag and calls on_human_tracked when it is flagged
+        """#creates an event listener for the justArrived flag and calls on_human_tracked when it is flagged
         self.subscriber = self.memory.subscriber("PeoplePerception/JustArrived")
         self.subscriber.signal.connect(self.on_human_tracked)
 
         #creates an event listener for the justLeft flag and calls on_human_tracked2 when it is flagged
         self.subscriber2 = self.memory.subscriber("PeoplePerception/JustLeft")
-        self.subscriber2.signal.connect(self.on_human_tracked2)
+        self.subscriber2.signal.connect(self.on_human_tracked2)"""
 
         motionProxy  = ALProxy("ALRobotPosture", self.ip, 9559)
         motionProxy.goToPosture("StandInit", 1.0)
 
         # Get the services ALTextToSpeech and ALFaceDetection.
-        self.tts = session.service("ALTextToSpeech")
-        self.tts.setVolume(0.5)
-        print(self.tts.getAvailableVoices())
-        time.sleep(10)
-        self.tts.setVoice("Kenny22Enhanced")
+        self.tts = session.service("ALAnimatedSpeech")
+            #self.tts.setVolume(1.5)
+        # print(self.tts.getAvailableVoices())
+        # time.sleep(10)
+        #'maki_n16', 'naoenu', 'naomnc'
+        #self.tts.setVoice("maki_n16")
+            #self.tts.setLanguage("English")
 
         self.face_detection = session.service("ALPeoplePerception")
         self.face_detection.subscribe("HumanGreeter")
@@ -48,19 +50,20 @@ class HumanGreeter(object):
 
         self.name = "" # used to store the name that it hears
 
-        
+        self.tts.say("Hello! ^start(animations/Stand/Gestures/Hey_1) Nice to meet you!")
 
         responce = ""
         while(self.awake):
             call("python ./robotGPT_call.py", shell=True)
-            with open("response.txt", "w") as f:
+            with open("response.txt", "r") as f:
                 responce = f.read()
-            
-            match responce:
-                # case x:
-                #     pass
-                case _:
-                    self.tts.say(responce)
+            self.tts.say(responce)
+        
+            # match responce:
+            #     # case x:
+            #     #     pass
+            #     case _:
+            #         self.tts.say(responce)
         
 
     def sleep(self):
@@ -96,15 +99,17 @@ class HumanGreeter(object):
             print( "Interrupted by user, stopping HumanGreeter")
             self.awake = False
             self.face_detection.unsubscribe("HumanGreeter")
+            self.sleep()
             #stop
+
             sys.exit(0)
   
 
 if __name__ == "__main__":
-    ip = "10.60.238.195"
+    ip = "10.60.11.4"#"10.60.238.195"
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, default=ip,
-                        help=f"Robot IP address. On robot or Local Naoqi: use {ip}.")
+                        help="Robot IP address. On robot or Local Naoqi: use "+ip)
     parser.add_argument("--port", type=int, default=9559,
                         help="Naoqi port number")
 
