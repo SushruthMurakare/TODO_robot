@@ -41,6 +41,9 @@ chat_history = [{"role": "system", "content": """
                 do not use spanish unless asked by a student.
                 Act more like a person than a robot.
                 Speak with negative politeness.
+                Use simple words.
+                Do not say anything offensive or potentially rude.
+                Be encouraging.
 				"""}]
 with open("history.txt", "w") as f:
 	json.dump(chat_history,f)

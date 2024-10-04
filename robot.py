@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- encoding: UTF-8 -*-
 
-
+#myenv/Scripts/activate
 import qi
 import time
 import sys
@@ -47,6 +47,10 @@ class HumanGreeter(object):
         self.face_detection = session.service("ALPeoplePerception")
         self.face_detection.subscribe("HumanGreeter")
         self.got_face = False
+
+        faceProxy = ALProxy("ALFaceDetection", self.ip, 9559)
+        # Enable or disable tracking.
+        faceProxy.enableTracking(True)
 
         self.name = "" # used to store the name that it hears
 
@@ -106,7 +110,7 @@ class HumanGreeter(object):
   
 
 if __name__ == "__main__":
-    ip = "10.60.11.4"#"10.60.238.195"
+    ip = "10.60.227.6"#"10.60.238.195"
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, default=ip,
                         help="Robot IP address. On robot or Local Naoqi: use "+ip)
