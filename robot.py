@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 # -*- encoding: UTF-8 -*-
-
-#myenv/Scripts/activate
+"""
+myenv/Scripts/activate
+python2 robot.py
+"""
 import qi
 import time
 import sys
@@ -33,11 +35,12 @@ class HumanGreeter(object):
         self.subscriber2.signal.connect(self.on_human_tracked2)"""
 
         motionProxy  = ALProxy("ALRobotPosture", self.ip, 9559)
-        motionProxy.goToPosture("StandInit", 1.0)
+        motionProxy.goToPosture("Stand", 1.0)
 
         # Get the services ALTextToSpeech and ALFaceDetection.
-        self.tts = session.service("ALAnimatedSpeech")
-            #self.tts.setVolume(1.5)
+        #self.tts = session.service("ALAnimatedSpeech")
+        self.tts = session.service("ALTextToSpeech")
+        self.tts.setVolume(1.5)
         # print(self.tts.getAvailableVoices())
         # time.sleep(10)
         #'maki_n16', 'naoenu', 'naomnc'
@@ -52,15 +55,21 @@ class HumanGreeter(object):
         # Enable or disable tracking.
         faceProxy.enableTracking(True)
 
+        self.leds = ALProxy("ALLeds",self.ip,9559)
+        #self.leds.on("EarLeds")
+
         self.name = "" # used to store the name that it hears
 
-        self.tts.say("Hello! ^start(animations/Stand/Gestures/Hey_1) Nice to meet you!")
+        #self.tts.say("Hello! ^start(animations/Stand/Gestures/Hey_1) Nice to meet you!")
+        self.tts.say("Hello! Nice to meet you!")
 
         responce = ""
         while(self.awake):
+            #self.leds.setIntensity("EarLedsBlue",0x000000FF,0.5)
             call("python ./robotGPT_call.py", shell=True)
             with open("response.txt", "r") as f:
                 responce = f.read()
+            #self.leds.setIntensity("EarLedsGreen",0x00FFFFFF,0.5)
             self.tts.say(responce)
         
             # match responce:
@@ -71,8 +80,8 @@ class HumanGreeter(object):
         
 
     def sleep(self):
-        motionProxy  = ALProxy("ALRobotPosture", self.ip, 9559)
-        motionProxy.goToPosture("Crouch", 1.0)
+        self.motionProxy  = ALProxy("ALRobotPosture", self.ip, 9559)
+        self.motionProxy.goToPosture("Crouch", 1.0)
 
 
     """def on_human_tracked(self, value):
