@@ -38,9 +38,11 @@ class HumanGreeter(object):
         motionProxy.goToPosture("Stand", 1.0)
 
         # Get the services ALTextToSpeech and ALFaceDetection.
-        #self.tts = session.service("ALAnimatedSpeech")
-        self.tts = session.service("ALTextToSpeech")
-        self.tts.setVolume(1.5)
+        # self.tts = session.service("ALTextToSpeech")
+        # self.tts.setVolume(1.5)
+
+        self.tts = session.service("ALAnimatedSpeech")
+        self.tts.setBodyLanguageMode(2)
         # print(self.tts.getAvailableVoices())
         # time.sleep(10)
         #'maki_n16', 'naoenu', 'naomnc'
@@ -57,7 +59,8 @@ class HumanGreeter(object):
 
         self.leds = ALProxy("ALLeds",self.ip,9559)
         #self.leds.on("EarLeds")
-
+        self.leds.off("EarLeds")
+        
         self.name = "" # used to store the name that it hears
 
         #self.tts.say("Hello! ^start(animations/Stand/Gestures/Hey_1) Nice to meet you!")
@@ -66,10 +69,13 @@ class HumanGreeter(object):
         responce = ""
         while(self.awake):
             #self.leds.setIntensity("EarLedsBlue",0x000000FF,0.5)
+            self.leds.on("EarLeds")
             call("python ./robotGPT_call.py", shell=True)
             with open("response.txt", "r") as f:
                 responce = f.read()
             #self.leds.setIntensity("EarLedsGreen",0x00FFFFFF,0.5)
+            self.leds.off("EarLeds")
+            print("Todo: " + responce)
             self.tts.say(responce)
         
             # match responce:
@@ -119,7 +125,7 @@ class HumanGreeter(object):
   
 
 if __name__ == "__main__":
-    ip = "10.60.227.6"#"10.60.238.195"
+    ip = "10.60.210.179"#"10.60.238.195"
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, default=ip,
                         help="Robot IP address. On robot or Local Naoqi: use "+ip)
